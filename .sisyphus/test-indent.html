@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Block Indent CSS Test</title>
+    <style>
+      /* Indent CSS (from block-indent.css) */
+      [data-indent="1"] {
+        padding-left: 2em;
+      }
+      [data-indent="2"] {
+        padding-left: 4em;
+      }
+      [data-indent="3"] {
+        padding-left: 6em;
+      }
+
+      /* Bullet list markers */
+      [data-list-type="bullet"]::before {
+        content: "•";
+        margin-right: 0.5em;
+        color: #333;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #fff;
+      }
+      p {
+        margin: 12px 0;
+        line-height: 1.5;
+      }
+      h2 {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        color: #222;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Indent Levels Test</h2>
+    <p>Level 0 (no indent)</p>
+    <p data-indent="1">Level 1 (2em indent)</p>
+    <p data-indent="2">Level 2 (4em indent)</p>
+    <p data-indent="3">Level 3 (6em indent)</p>
+
+    <h2>Bullet List Markers Test</h2>
+    <p data-list-type="bullet" data-indent="1">Bullet item with 1em indent</p>
+    <p data-list-type="bullet" data-indent="2">
+      Nested bullet item with 4em indent
+    </p>
+  </body>
+</html>

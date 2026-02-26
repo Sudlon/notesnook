@@ -28,24 +28,66 @@ export const BlockIndent = Extension.create({
 
   addCommands() {
     return {
-      indent:
-        () =>
-        ({ tr, state, dispatch }) => {
-          // Placeholder - will implement in next task
-          return false;
-        },
-      outdent:
-        () =>
-        ({ tr, state, dispatch }) => {
-          // Placeholder - will implement in next task
-          return false;
-        },
-      setIndent:
-        (level: number) =>
-        ({ tr, state, dispatch }) => {
-          // Placeholder - will implement in next task
-          return false;
-        }
+      indent: () => ({ tr, state, dispatch }) => {
+        const { selection } = state;
+        const { $from, $to } = selection;
+        
+        if (!dispatch) return true;
+        
+        // Iterate through all blocks in selection
+        state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+          if (node.type.name === 'paragraph' || node.type.name === 'heading' || node.type.name === 'blockquote') {
+            const currentIndent = node.attrs.indent || 0;
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              indent: currentIndent + 1
+            });
+          }
+        });
+        
+        return true;
+      },
+      
+      outdent: () => ({ tr, state, dispatch }) => {
+        const { selection } = state;
+        const { $from, $to } = selection;
+        
+        if (!dispatch) return true;
+        
+        // Iterate through all blocks in selection
+        state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+          if (node.type.name === 'paragraph' || node.type.name === 'heading' || node.type.name === 'blockquote') {
+            const currentIndent = node.attrs.indent || 0;
+            if (currentIndent > 0) {
+              tr.setNodeMarkup(pos, undefined, {
+                ...node.attrs,
+                indent: currentIndent - 1
+              });
+            }
+          }
+        });
+        
+        return true;
+      },
+      
+      setIndent: (level: number) => ({ tr, state, dispatch }) => {
+        const { selection } = state;
+        const { $from, $to } = selection;
+        
+        if (!dispatch) return true;
+        
+        // Iterate through all blocks in selection
+        state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+          if (node.type.name === 'paragraph' || node.type.name === 'heading' || node.type.name === 'blockquote') {
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              indent: Math.max(0, level) // Ensure non-negative
+            });
+          }
+        });
+        
+        return true;
+      }
     };
   }
 });
