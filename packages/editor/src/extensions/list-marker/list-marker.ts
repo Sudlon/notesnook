@@ -1,7 +1,20 @@
 import { Extension, InputRule } from "@tiptap/core";
 
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    listMarker: {
+      toggleBulletMarker: () => ReturnType;
+      toggleOrderedMarker: () => ReturnType;
+      toggleCheckMarker: () => ReturnType;
+      setListType: (type: string | null) => ReturnType;
+      toggleChecked: () => ReturnType;
+    };
+  }
+}
+
 export const ListMarker = Extension.create({
   name: "listMarker",
+
 
   addGlobalAttributes() {
     return [

@@ -1,7 +1,18 @@
 import { Extension } from "@tiptap/core";
 
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    blockIndent: {
+      indent: () => ReturnType;
+      outdent: () => ReturnType;
+      setIndent: (level: number) => ReturnType;
+    };
+  }
+}
+
 export const BlockIndent = Extension.create({
   name: "blockIndent",
+
 
   addGlobalAttributes() {
     return [
