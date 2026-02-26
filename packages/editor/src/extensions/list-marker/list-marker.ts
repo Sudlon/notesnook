@@ -1,4 +1,5 @@
 import { Extension, InputRule } from "@tiptap/core";
+import { createOrderedNumberingPlugin } from "./ordered-numbering.js";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -14,7 +15,6 @@ declare module "@tiptap/core" {
 
 export const ListMarker = Extension.create({
   name: "listMarker",
-
 
   addGlobalAttributes() {
     return [
@@ -44,10 +44,26 @@ export const ListMarker = Extension.create({
                 "data-checked": attributes.checked ? "true" : "false"
               };
             }
+          },
+          listNumber: {
+            default: null,
+            parseHTML: (element) => {
+              return element.getAttribute("data-list-number") || null;
+            },
+            renderHTML: (attributes) => {
+              if (!attributes.listNumber) return {};
+              return {
+                "data-list-number": attributes.listNumber
+              };
+            }
           }
         }
       }
     ];
+  },
+
+  addProseMirrorPlugins() {
+    return [createOrderedNumberingPlugin()];
   },
 
   addInputRules() {
