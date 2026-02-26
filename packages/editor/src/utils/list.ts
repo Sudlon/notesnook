@@ -30,7 +30,26 @@ import { Editor } from "@tiptap/core";
 import { LIST_NODE_TYPES } from "./node-types.js";
 
 export function isListActive(editor: Editor): boolean {
-  return LIST_NODE_TYPES.some((name) => editor.isActive(name));
+  // Check nested list nodes (TaskList, OutlineList, BulletList, OrderedList, CheckList)
+  const hasNestedList = LIST_NODE_TYPES.some((name) => editor.isActive(name));
+
+  // Check flat list markers (listType attribute on paragraph/heading)
+  const hasFlatListMarker =
+    editor.isActive("paragraph", { listType: "bullet" }) ||
+    editor.isActive("paragraph", { listType: "ordered" }) ||
+    editor.isActive("paragraph", { listType: "check" }) ||
+    editor.isActive("heading", { listType: "bullet" }) ||
+    editor.isActive("heading", { listType: "ordered" }) ||
+    editor.isActive("heading", { listType: "check" });
+
+  return hasNestedList || hasFlatListMarker;
+}
+
+export function isTaskOrOutlineListActive(editor: Editor): boolean {
+  // Only check for nested task/outline lists, NOT flat markers
+  return (
+    editor.isActive(TaskListNode.name) || editor.isActive(OutlineList.name)
+  );
 }
 
 export function findListItemType(editor: Editor): string | null {
