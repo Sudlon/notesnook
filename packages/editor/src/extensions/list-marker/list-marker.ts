@@ -1,4 +1,4 @@
-import { Extension } from "@tiptap/core";
+import { Extension, InputRule } from "@tiptap/core";
 
 export const ListMarker = Extension.create({
   name: "listMarker",
@@ -34,6 +34,85 @@ export const ListMarker = Extension.create({
           }
         }
       }
+    ];
+  },
+
+  addInputRules() {
+    return [
+      new InputRule({
+        find: /^\s*([-*])\s$/,
+        handler: ({ state, range, match }) => {
+          const { from, to } = range;
+          const $from = state.selection.$from;
+          const node = $from.parent;
+          const tr = state.tr;
+
+          // Replace the matched text
+          tr.delete(from, to);
+
+          // Set listType attribute on the current node
+          tr.setNodeMarkup(from - 1, undefined, {
+            ...node.attrs,
+            listType: "bullet"
+          });
+        }
+      }),
+      new InputRule({
+        find: /^\s*(\d+)\.\s$/,
+        handler: ({ state, range, match }) => {
+          const { from, to } = range;
+          const $from = state.selection.$from;
+          const node = $from.parent;
+          const tr = state.tr;
+
+          // Replace the matched text
+          tr.delete(from, to);
+
+          // Set listType attribute on the current node
+          tr.setNodeMarkup(from - 1, undefined, {
+            ...node.attrs,
+            listType: "ordered"
+          });
+        }
+      }),
+      new InputRule({
+        find: /^\s*\[\s?\]\s$/,
+        handler: ({ state, range, match }) => {
+          const { from, to } = range;
+          const $from = state.selection.$from;
+          const node = $from.parent;
+          const tr = state.tr;
+
+          // Replace the matched text
+          tr.delete(from, to);
+
+          // Set listType and checked attributes on the current node
+          tr.setNodeMarkup(from - 1, undefined, {
+            ...node.attrs,
+            listType: "check",
+            checked: false
+          });
+        }
+      }),
+      new InputRule({
+        find: /^\s*\[[xX]\]\s$/,
+        handler: ({ state, range, match }) => {
+          const { from, to } = range;
+          const $from = state.selection.$from;
+          const node = $from.parent;
+          const tr = state.tr;
+
+          // Replace the matched text
+          tr.delete(from, to);
+
+          // Set listType and checked attributes on the current node
+          tr.setNodeMarkup(from - 1, undefined, {
+            ...node.attrs,
+            listType: "check",
+            checked: true
+          });
+        }
+      })
     ];
   },
 

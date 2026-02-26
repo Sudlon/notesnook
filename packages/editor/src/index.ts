@@ -87,6 +87,8 @@ import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
 import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
 import { SearchResult } from "./extensions/search-result/search-result.js";
+import { BlockIndent } from "./extensions/block-indent/index.js";
+import { ListMarker } from "./extensions/list-marker/index.js";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -331,6 +333,8 @@ const useTiptap = (
         CheckListItem.configure({
           nested: true
         }),
+        BlockIndent,
+        ListMarker,
 
         Callout,
 
