@@ -42,7 +42,6 @@ import {
   AttachmentNode,
   AttachmentType
 } from "./extensions/attachment/index.js";
-import BulletList from "./extensions/bullet-list/index.js";
 import { CodeBlock } from "./extensions/code-block/index.js";
 import { Codemark } from "./extensions/code-mark/index.js";
 import { DateTime, DateTimeOptions } from "./extensions/date-time/index.js";
@@ -55,7 +54,6 @@ import { KeepInView } from "./extensions/keep-in-view/index.js";
 import { KeyMap } from "./extensions/key-map/index.js";
 import { ListItem } from "./extensions/list-item/index.js";
 import { MathBlock, MathInline } from "./extensions/math/index.js";
-import OrderedList from "./extensions/ordered-list/index.js";
 import { OutlineList } from "./extensions/outline-list/index.js";
 import { OutlineListItem } from "./extensions/outline-list-item/index.js";
 import { Paragraph } from "./extensions/paragraph/index.js";
@@ -76,8 +74,6 @@ import Clipboard from "./extensions/clipboard/index.js";
 import Blockquote from "./extensions/blockquote/index.js";
 import { Quirks } from "./extensions/quirks/index.js";
 import { LIST_NODE_TYPES } from "./utils/node-types.js";
-import CheckList from "./extensions/check-list/index.js";
-import CheckListItem from "./extensions/check-list-item/index.js";
 import { Callout } from "./extensions/callout/index.js";
 import BlockId from "./extensions/block-id/index.js";
 import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
@@ -276,8 +272,6 @@ const useTiptap = (
         FontSize,
         TextDirection,
         FontFamily,
-        BulletList.configure({ keepMarks: true, keepAttributes: true }),
-        OrderedList.configure({ keepMarks: true, keepAttributes: true }),
         TaskItemNode.configure({ nested: true }),
         TaskListNode,
         Link.extend({
@@ -329,10 +323,6 @@ const useTiptap = (
         DateTime.configure({ dateFormat, timeFormat, dayFormat }),
         KeyMap,
         WebClipNode,
-        CheckList,
-        CheckListItem.configure({
-          nested: true
-        }),
         BlockIndent,
         ListMarker,
 
@@ -344,7 +334,6 @@ const useTiptap = (
             CodeBlock.name,
             TaskListNode.name,
             Table.name,
-            CheckList.name,
             AttachmentNode.name
           ],
           escapableNodesIfAtDocumentStart: [
@@ -358,10 +347,6 @@ const useTiptap = (
         ListKeymap.configure({
           listTypes: [
             {
-              itemName: ListItem.name,
-              wrapperNames: [BulletList.name, OrderedList.name]
-            },
-            {
               itemName: TaskItemNode.name,
               wrapperNames: [TaskListNode.name]
             },
@@ -369,10 +354,6 @@ const useTiptap = (
               itemName: OutlineListItem.name,
               wrapperNames: [OutlineList.name]
             },
-            {
-              itemName: CheckListItem.name,
-              wrapperNames: [CheckList.name]
-            }
           ]
         }),
         FontLigature.configure({ enabled: enableFontLigatures }),
