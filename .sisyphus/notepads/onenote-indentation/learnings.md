@@ -1288,3 +1288,43 @@ Successfully completed Task 13e by:
 All test files now align with the new architecture where BulletList, OrderedList, CheckList, and CheckListItem extensions have been removed.
 
 **Status**: ✅ COMPLETE & VERIFIED
+
+## [2026-02-27T13:51:XXZ] Task 13f: Final Verification Complete
+
+**Task**: Final verification and cleanup after removing old nested list extensions.
+
+**Discovered Issue**: extension-imports.ts still had type exports for removed extensions
+
+**Resolution**:
+- Removed type exports from extension-imports.ts:
+  - Line 32: `export type * from "./extensions/bullet-list/index.js";`
+  - Line 33: `export type * from "./extensions/ordered-list/index.js";`
+  - Line 49: `export type * from "./extensions/check-list/index.js";`
+  - Line 50: `export type * from "./extensions/check-list-item/index.js";`
+
+**Final Verification Results**:
+- ✅ No imports of bullet-list/ordered-list/check-list in active code (excluding extension dirs themselves)
+- ✅ TypeScript compilation: 11 errors (all pre-existing, none from our changes)
+- ✅ Test suite: 164/169 passing
+  - 5 key-map test failures are pre-existing (toggleTextColor.keys undefined)
+  - 7 obsolete snapshots from removed tests (expected)
+- ✅ Full editor test suite runs without new failures
+
+**Task 13 (a-f) Summary**:
+- 13a: Dependency analysis (790 lines in learnings.md)
+- 13b: Removed extensions from index.ts (commit c6247b320)
+- 13c: Updated utils (node-types.ts, list.ts) (commit a19decf51)
+- 13d: Updated move-node.ts (commit b5a6ed39a)
+- 13e: Updated/removed test files (commit 6fe3d7a89)
+- 13f: Final verification and extension-imports.ts cleanup
+
+**Extension Directories Remaining**:
+The following extension directories still exist but are no longer registered:
+- packages/editor/src/extensions/bullet-list/
+- packages/editor/src/extensions/ordered-list/
+- packages/editor/src/extensions/check-list/
+- packages/editor/src/extensions/check-list-item/
+
+These directories can be deleted in a future cleanup task if desired, but they are not imported or used anywhere in active code.
+
+**Status**: ✅ COMPLETE — Task 13 fully complete, all old list extension references removed
