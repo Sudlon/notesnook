@@ -1073,3 +1073,87 @@ After removal, these extension directories can be deleted:
    - Keep the TaskItemNode and OutlineListItem configs
    - This separates flat list behavior from nested list behavior
 
+
+## Execution Log: Phase 1 Complete
+
+**Commit**: c6247b320 - "refactor(editor): remove old nested list extension registrations"
+
+### Summary of Changes
+- Removed 4 imports from packages/editor/src/index.ts:
+  - BulletList (line 45)
+  - OrderedList (line 58)
+  - CheckList (line 79)
+  - CheckListItem (line 80)
+
+- Removed from extensions array:
+  - BulletList.configure() (was line 279)
+  - OrderedList.configure() (was line 280)
+  - CheckList direct usage (was line 332)
+  - CheckListItem.configure() block (was lines 333-335)
+
+- Updated Quirks config:
+  - Removed CheckList.name from irremovableNodesOnBackspace array
+
+- Updated ListKeymap config:
+  - Removed ListItem + BulletList/OrderedList config block
+  - Removed CheckListItem + CheckList config block
+  - **Preserved**: TaskItemNode and OutlineListItem configs
+
+### Verification Results
+✅ TypeScript compilation: No errors related to removed references
+✅ Grep verification: No remaining references to removed extensions
+✅ Git commit: Created with conventional format (--signoff applied)
+
+### Key Insights
+1. File changed from 456 lines to 437 lines (19 lines removed)
+2. ListItem kept intact - critical for TaskList and OutlineList
+3. TaskListNode and OutlineList configurations preserved
+4. All removals atomic and clean - no dangling references
+
+### Next Steps
+Phase 2 tasks to follow:
+- Update node-types.ts (LIST_NODE_TYPES and LIST_ITEM_NODE_TYPES)
+- Update list.ts utilities (isListActive, findListItemType)
+- Update prosemirror.ts (getParentAttributes references)
+
+## [2026-02-27T00:XX:XXZ] Task 13c: Utils Cleanup — COMPLETE
+
+**Task**: Remove references to old nested list extensions (BulletList, OrderedList, CheckList, CheckListItem) from utility files after Task 13b removed them from extension registration.
+
+**Files Modified**:
+
+### packages/editor/src/utils/node-types.ts
+- Removed imports:
+  - `BulletList` from `@tiptap/extension-bullet-list`
+  - `OrderedList` from `@tiptap/extension-ordered-list`
+  - `CheckList` from `../extensions/check-list/index.js`
+  - `CheckListItem` from `../extensions/check-list-item/index.js`
+- Updated `LIST_NODE_TYPES` array:
+  - Removed: `BulletList.name`, `OrderedList.name`, `CheckList.name`
+  - Kept: `TaskList.name`, `OutlineList.name` (nested lists that remain)
+- Updated `LIST_ITEM_NODE_TYPES` array:
+  - Removed: `CheckListItem.name`
+  - Kept: `TaskItem.name`, `OutlineListItem.name`, `ListItem.name` (TaskList still uses ListItem)
+
+### packages/editor/src/utils/list.ts
+- Removed imports:
+  - `BulletList` from `../extensions/bullet-list/index.js`
+  - `OrderedList` from `../extensions/ordered-list/index.js`
+  - `CheckList` from `../extensions/check-list/index.js`
+  - `CheckListItem` from `../extensions/check-list-item/index.js`
+- Updated `findListItemType()` function:
+  - Removed conditional branches for `BulletList`, `OrderedList`, `CheckList`
+  - Function now only handles: `TaskList` → `TaskItemNode`, `OutlineList` → `OutlineListItem`
+  - Returns `null` for non-nested lists (flat list markers on paragraphs/headings)
+
+**Verification Results**:
+- ✅ TypeScript compilation: No NEW errors (11 pre-existing errors unchanged)
+- ✅ Import check: No stray imports to removed extensions in utils folder
+- ✅ File structure: Both utility files syntactically correct, consistent with Phase 2 plan
+
+**Pattern Consistency**:
+- Matches Task 13b approach: surgical removals only, no broader refactoring
+- Maintains backward compatibility: Flat lists via paragraph/heading attributes still work
+- Preserves nested list functionality: TaskList and OutlineList continue to work unchanged
+
+**Status**: ✅ COMPLETE — Ready for Task 13d (Extension folder cleanup)
