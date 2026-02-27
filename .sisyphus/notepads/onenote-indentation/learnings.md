@@ -1157,3 +1157,53 @@ Phase 2 tasks to follow:
 - Preserves nested list functionality: TaskList and OutlineList continue to work unchanged
 
 **Status**: ✅ COMPLETE — Ready for Task 13d (Extension folder cleanup)
+
+## [Task 13d] 2026-02-27 move-node.ts Cleanup Complete
+
+**File Modified**: packages/editor/src/extensions/key-map/move-node.ts
+
+**Removals Applied**:
+- Import: `import OrderedList from "@tiptap/extension-ordered-list"` (line 21)
+- Import: `import { BulletList } from "../bullet-list/bullet-list.js"` (line 30)
+- Import: `import { CheckList } from "../check-list/check-list.js"` (line 32)
+- validParents array: Removed `BulletList.name`, `OrderedList.name`, `CheckList.name`
+
+**Preserved Correctly**:
+- validParents: Callout, Table, TaskListNode, OutlineList, Blockquote
+- listItems array: ListItem, CheckListItem, TaskItemNode, OutlineListItem
+- Function logic: moveParentUp/moveParentDown remain unchanged
+
+**Verification Results**:
+✅ TypeScript compilation: No NEW errors (11 pre-existing in apps/desktop)
+✅ Import check: No stray imports of bullet-list/ordered-list/check-list in key-map directory
+✅ No broken references - all remaining extensions are valid
+
+**Logic Impact Confirmed**:
+- moveParentUp/moveParentDown no longer work for flat lists (CORRECT - they use indent/outdent instead)
+- Nested lists (TaskListNode, OutlineListNode) continue to support parent movement via validParents
+- This aligns with architecture change: flat lists are now paragraph attributes, not container types
+
+**Status**: ✅ COMPLETE
+
+Next task: Task 13e - Update test files
+
+## [Task 13d - Addendum] CheckListItem Cleanup
+
+**Additional Removal**:
+- Import: `import { CheckListItem } from "../check-list-item/check-list-item.js"` (line 34)
+- listItems array: Removed `CheckListItem.name` entry
+
+**listItems Array Updated**:
+Now contains only 3 active list item types:
+- ListItem.name (for TaskList)
+- TaskItemNode.name (for TaskList items)
+- OutlineListItem.name (for OutlineList items)
+
+**Rationale**: CheckListItem was part of the old nested check list system that has been removed. The resolveNode function only needs to recognize the list item types that are still in use.
+
+**Verification**:
+✅ grep CheckListItem: Returns nothing (completely removed)
+✅ TypeScript: No NEW errors
+✅ listItems array: 3 entries (correct count)
+
+**Status**: ✅ COMPLETE & VERIFIED

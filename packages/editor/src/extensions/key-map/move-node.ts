@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor } from "@tiptap/core";
-import OrderedList from "@tiptap/extension-ordered-list";
 import { Fragment, Node, Slice } from "@tiptap/pm/model";
 import { Selection } from "@tiptap/pm/state";
 import { ReplaceStep } from "@tiptap/pm/transform";
@@ -27,14 +26,11 @@ import {
   findParentNodeOfType
 } from "../../utils/prosemirror.js";
 import { Blockquote } from "../blockquote/blockquote.js";
-import { BulletList } from "../bullet-list/bullet-list.js";
 import { Callout } from "../callout/callout.js";
-import { CheckList } from "../check-list/check-list.js";
 import { OutlineList } from "../outline-list/outline-list.js";
 import { Table } from "../table/table.js";
 import { TaskListNode } from "../task-list/task-list.js";
 import { ListItem } from "../list-item/list-item.js";
-import { CheckListItem } from "../check-list-item/check-list-item.js";
 import { TaskItemNode } from "../task-item/task-item.js";
 import { OutlineListItem } from "../outline-list-item/outline-list-item.js";
 
@@ -59,7 +55,6 @@ function mapChildren<T>(
 
 const listItems = [
   ListItem.name,
-  CheckListItem.name,
   TaskItemNode.name,
   OutlineListItem.name
 ];
@@ -105,10 +100,7 @@ function resolveNode(editor: Editor): ResolvedNode | undefined {
 const validParents = [
   Callout.name,
   Table.name,
-  BulletList.name,
-  OrderedList.name,
   TaskListNode.name,
-  CheckList.name,
   OutlineList.name,
   Blockquote.name
 ];
