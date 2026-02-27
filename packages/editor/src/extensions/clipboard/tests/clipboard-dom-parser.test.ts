@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test } from "vitest";
+import { test, describe, expect } from "vitest";
 import {
   formatCodeblocks,
   convertBrToSingleSpacedParagraphs,
-  convertGoogleDocsChecklist
+  convertGoogleDocsChecklist,
+  convertNestedListsToFlat
 } from "../clipboard-dom-parser.js";
 
 const cases = [
@@ -157,3 +158,112 @@ for (const checkList of checkLists) {
     t.expect(element.body.innerHTML.trim()).toMatchSnapshot();
   });
 }
+
+
+
+describe("convertNestedListsToFlat", () => {
+  test("simple flat bullet list", () => {
+    const html = "<ul><li>Item</li></ul>";
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    const p = doc.body.querySelector("p");
+    expect(p).toBeTruthy();
+    expect(p?.getAttribute("data-indent")).toBe("0");
+    expect(p?.getAttribute("data-list-type")).toBe("bullet");
+    expect(p?.textContent).toBe("Item");
+  });
+
+  test("nested bullet list with correct indents", () => {
+    const html = "<ul><li>A<ul><li>B</li></ul></li></ul>";
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    const ps = doc.body.querySelectorAll("p");
+    expect(ps.length).toBe(2);
+    expect(ps[0].getAttribute("data-indent")).toBe("0");
+    expect(ps[0].getAttribute("data-list-type")).toBe("bullet");
+    expect(ps[0].textContent).toBe("A");
+    expect(ps[1].getAttribute("data-indent")).toBe("1");
+    expect(ps[1].getAttribute("data-list-type")).toBe("bullet");
+    expect(ps[1].textContent).toBe("B");
+  });
+
+  test("ordered list produces correct list type", () => {
+    const html = "<ol><li>First</li><li>Second</li></ol>";
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    const ps = doc.body.querySelectorAll("p");
+    expect(ps.length).toBe(2);
+    expect(ps[0].getAttribute("data-list-type")).toBe("ordered");
+    expect(ps[0].getAttribute("data-indent")).toBe("0");
+    expect(ps[1].getAttribute("data-list-type")).toBe("ordered");
+  });
+
+  test("deeply nested list (3+ levels) with correct indents", () => {
+    const html = "<ul><li>A<ul><li>B<ul><li>C</li></ul></li></ul></li></ul>";
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    const ps = doc.body.querySelectorAll("p");
+    expect(ps.length).toBe(3);
+    expect(ps[0].getAttribute("data-indent")).toBe("0");
+    expect(ps[1].getAttribute("data-indent")).toBe("1");
+    expect(ps[2].getAttribute("data-indent")).toBe("2");
+    expect(ps[0].textContent).toBe("A");
+    expect(ps[1].textContent).toBe("B");
+    expect(ps[2].textContent).toBe("C");
+  });
+
+  test("does NOT convert TipTap task list", () => {
+    const html = '<ul data-type="taskList"><li data-type="taskItem">Task</li></ul>';
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    // Should NOT be converted - ul/li should still exist
+    const ul = doc.body.querySelector("ul");
+    expect(ul).toBeTruthy();
+    expect(ul?.getAttribute("data-type")).toBe("taskList");
+    expect(doc.body.querySelector("p[data-list-type]")).toBeNull();
+  });
+
+  test("empty li produces empty p with correct indent", () => {
+    const html = "<ul><li></li></ul>";
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    const p = doc.body.querySelector("p");
+    expect(p).toBeTruthy();
+    expect(p?.getAttribute("data-indent")).toBe("0");
+    expect(p?.getAttribute("data-list-type")).toBe("bullet");
+    expect(p?.textContent).toBe("");
+  });
+
+  test("mixed list types (ol inside ul) changes list type per level", () => {
+    const html = "<ul><li>Bullet<ol><li>Number</li></ol></li></ul>";
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    const ps = doc.body.querySelectorAll("p");
+    expect(ps.length).toBe(2);
+    expect(ps[0].getAttribute("data-list-type")).toBe("bullet");
+    expect(ps[1].getAttribute("data-list-type")).toBe("ordered");
+    expect(ps[0].getAttribute("data-indent")).toBe("0");
+    expect(ps[1].getAttribute("data-indent")).toBe("1");
+  });
+
+  test("non-list content (table) unchanged", () => {
+    const html = "<table><tr><td>Cell</td></tr></table>";
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    // Table should be unchanged
+    const table = doc.body.querySelector("table");
+    expect(table).toBeTruthy();
+    expect(doc.body.querySelectorAll("p[data-list-type]")).toHaveLength(0);
+  });
+
+  test("does NOT convert outline list", () => {
+    const html = '<ol data-type="outlineList"><li>Outline</li></ol>';
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    convertNestedListsToFlat(doc.body);
+    // Should NOT be converted
+    const ol = doc.body.querySelector("ol");
+    expect(ol).toBeTruthy();
+    expect(ol?.getAttribute("data-type")).toBe("outlineList");
+    expect(doc.body.querySelector("p[data-list-type]")).toBeNull();
+  });
+});

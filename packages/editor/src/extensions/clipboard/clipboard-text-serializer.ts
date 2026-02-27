@@ -31,8 +31,87 @@ export function getTextBetween(slice: Slice, schema: Schema): string {
   const separator = "\n";
   let text = "";
   let separated = true;
+  const orderedCounters = new Map<number, number>();
+  const skipNodeRanges = new Set<string>(); // Track ranges to skip (e.g., inside flat lists)
 
   slice.content.nodesBetween(0, slice.size, (node, pos, parent, index) => {
+    const nodeEnd = pos + node.nodeSize;
+    
+    // Check if this node is inside a skipped range
+    for (const range of skipNodeRanges) {
+      const [rangeStart, rangeEnd] = range.split("-").map(Number);
+      if (pos >= rangeStart && nodeEnd <= rangeEnd) {
+        return; // Skip this node
+      }
+    }
+
+    // Check for flat list attributes (indent + listType)
+    if (node.isBlock && (node.type.name === "paragraph" || node.type.name === "heading")) {
+      const indent = node.attrs.indent || 0;
+      const listType = node.attrs.listType;
+
+      if (indent > 0 || listType) {
+        // Mark this node's range to skip processing its children
+        skipNodeRanges.add(`${pos}-${nodeEnd}`);
+
+        // Ensure we have a separator before this block
+        if (!separated && text.length > 0) {
+          text += separator;
+        }
+
+        // Build prefix based on indent and listType
+        let prefix = "  ".repeat(indent);
+
+        if (listType === "bullet") {
+          prefix += "- ";
+        } else if (listType === "ordered") {
+          // Track counters per indent level
+          if (!orderedCounters.has(indent)) {
+            orderedCounters.set(indent, 1);
+          }
+          const counter = orderedCounters.get(indent) || 1;
+          prefix += `${counter}. `;
+          orderedCounters.set(indent, counter + 1);
+        } else if (listType === "check") {
+          const checked = node.attrs.checked ? "x" : " ";
+          prefix += `- [${checked}] `;
+        }
+
+        // Extract text from node recursively
+        let nodeText = "";
+        node.forEach((child) => {
+          if (child.isText) {
+            nodeText += child.text;
+          } else if (!child.isBlock) {
+            // Handle inline nodes like marks
+            child.forEach((grandchild) => {
+              if (grandchild.isText) {
+                nodeText += grandchild.text;
+              }
+            });
+          }
+        });
+
+        text += prefix + nodeText;
+        separated = false;
+        return; // Skip default processing for this node
+      }
+    }
+
+    // Reset ordered counters when indentation decreases
+    if (
+      node.isBlock &&
+      (node.type.name === "paragraph" || node.type.name === "heading")
+    ) {
+      const currentIndent = node.attrs.indent || 0;
+      // Clean up counters for deeper levels
+      for (const [level] of orderedCounters) {
+        if (level > currentIndent) {
+          orderedCounters.delete(level);
+        }
+      }
+    }
+
     const textSerializer = schema.nodes[node.type.name]?.spec
       .toText as TextSerializer;
 

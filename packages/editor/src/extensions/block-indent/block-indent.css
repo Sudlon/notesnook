@@ -1,0 +1,119 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/* Progressive indent levels: 2em per level (levels 1-20) */
+[data-indent="1"] {
+  padding-left: 2em;
+}
+
+[data-indent="2"] {
+  padding-left: 4em;
+}
+
+[data-indent="3"] {
+  padding-left: 6em;
+}
+
+[data-indent="4"] {
+  padding-left: 8em;
+}
+
+[data-indent="5"] {
+  padding-left: 10em;
+}
+
+[data-indent="6"] {
+  padding-left: 12em;
+}
+
+[data-indent="7"] {
+  padding-left: 14em;
+}
+
+[data-indent="8"] {
+  padding-left: 16em;
+}
+
+[data-indent="9"] {
+  padding-left: 18em;
+}
+
+[data-indent="10"] {
+  padding-left: 20em;
+}
+
+[data-indent="11"] {
+  padding-left: 22em;
+}
+
+[data-indent="12"] {
+  padding-left: 24em;
+}
+
+[data-indent="13"] {
+  padding-left: 26em;
+}
+
+[data-indent="14"] {
+  padding-left: 28em;
+}
+
+[data-indent="15"] {
+  padding-left: 30em;
+}
+
+[data-indent="16"] {
+  padding-left: 32em;
+}
+
+[data-indent="17"] {
+  padding-left: 34em;
+}
+
+[data-indent="18"] {
+  padding-left: 36em;
+}
+
+[data-indent="19"] {
+  padding-left: 38em;
+}
+
+[data-indent="20"] {
+  padding-left: 40em;
+}
+
+/* Bullet list markers */
+[data-list-type="bullet"]::before {
+  content: "•";
+  margin-right: 0.5em;
+  color: var(--paragraph-secondary, currentColor);
+}
+
+/* Ordered list markers with dynamic numbering */
+[data-list-type="ordered"]::before {
+  content: attr(data-list-number) ".";
+  margin-right: 0.5em;
+  color: var(--paragraph-secondary, currentColor);
+}
+
+/* Check list markers are handled by node view (checkbox element injected by Task 2) */
+[data-list-type="check"] {
+  /* Styling for check list container; checkbox element is injected by node view */
+  position: relative;
+}

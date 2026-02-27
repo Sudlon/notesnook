@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { tiptapKeys } from "@notesnook/common";
 import { Extension } from "@tiptap/core";
 import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
-import { isListActive } from "../../utils/list.js";
+import { isListActive, isTaskOrOutlineListActive } from "../../utils/list.js";
 import { CodeBlock } from "../code-block/index.js";
 import { isInTable } from "../table/prosemirror-tables/util.js";
 import { config } from "../../utils/config.js";
@@ -39,18 +39,30 @@ export const KeyMap = Extension.create({
   addKeyboardShortcuts() {
     return {
       Tab: ({ editor }) => {
-        if (
-          isListActive(editor) ||
-          isInTable(editor.state) ||
-          editor.isActive(CodeBlock.name)
-        )
-          return false;
-
-        return editor.commands.insertContent("\t");
+        // Preserve table behavior
+        if (isInTable(editor.state)) return false;
+        
+        // Preserve code block behavior
+        if (editor.isActive(CodeBlock.name)) return false;
+        
+        // Preserve task/outline list behavior (nested lists use sink/lift)
+        if (isTaskOrOutlineListActive(editor)) return false;
+        
+        // NEW: Universal indent for all other blocks (including flat lists)
+        return editor.commands.indent();
       },
       "Shift-Tab": ({ editor }) => {
-        if (isListActive(editor)) return false;
-        return true;
+        // Preserve table behavior
+        if (isInTable(editor.state)) return false;
+        
+        // Preserve code block behavior
+        if (editor.isActive(CodeBlock.name)) return false;
+        
+        // Preserve task/outline list behavior
+        if (isTaskOrOutlineListActive(editor)) return false;
+        
+        // NEW: Universal outdent
+        return editor.commands.outdent();
       },
       [tiptapKeys.removeFormattingInSelection.keys]: ({ editor }) => {
         editor
@@ -136,6 +148,15 @@ export const KeyMap = Extension.create({
         }
 
         return editor.commands.deleteNode(currentNode.type);
+      },
+      [tiptapKeys.toggleBulletList.keys]: ({ editor }) => {
+        return editor.commands.toggleBulletMarker();
+      },
+      [tiptapKeys.toggleOrderedList.keys]: ({ editor }) => {
+        return editor.commands.toggleOrderedMarker();
+      },
+      [tiptapKeys.toggleCheckList.keys]: ({ editor }) => {
+        return editor.commands.toggleCheckMarker();
       }
     };
   }

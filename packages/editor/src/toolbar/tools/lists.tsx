@@ -29,7 +29,6 @@ import {
 import { getToolbarElement } from "../utils/dom.js";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { ToolButton } from "../components/tool-button.js";
-import { findListItemType, isListActive } from "../../utils/list.js";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];
@@ -101,14 +100,16 @@ function ListTool<TListStyleTypes extends string>(
                 let chain = editor.chain().focus();
                 if (!chain || !editor) return;
 
-                if (!isListActive(editor)) {
-                  if (type === "bulletList") chain = chain.toggleBulletList();
-                  else chain = chain.toggleOrderedList();
+                const isActive = editor.isActive("paragraph", { listType: item.type }) || editor.isActive("heading", { listType: item.type });
+
+                if (isActive) {
+                  chain = chain.setListType(null);
+                } else {
+                  chain = chain.setListType(item.type);
                 }
+                
                 close();
-                return chain
-                  .updateAttributes(type, { listType: item.type })
-                  .run();
+                return chain.run();
               }}
             >
               <ListThumbnail listStyleType={item.type} />
@@ -124,7 +125,7 @@ export function NumberedList(props: ToolProps) {
   const { editor } = props;
 
   const onClick = useCallback(
-    () => editor.chain().focus().toggleOrderedList().run(),
+    () => editor.chain().focus().toggleOrderedMarker().run(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -133,7 +134,23 @@ export function NumberedList(props: ToolProps) {
     <ListTool
       {...props}
       type="orderedList"
-      isActive={editor.isActive("orderedList")}
+isActive={
+editor.isActive("paragraph", { listType: "ordered" }) ||
+        editor.isActive("heading", { listType: "ordered" }) ||
+        editor.isActive("paragraph", { listType: "decimal"
+      }) ||
+        editor.isActive("heading", { listType: "decimal" }) ||
+        editor.isActive("paragraph", { listType: "upper-alpha" }) ||
+        editor.isActive("heading", { listType: "upper-alpha" }) ||
+        editor.isActive("paragraph", { listType: "lower-alpha" }) ||
+        editor.isActive("heading", { listType: "lower-alpha" }) ||
+        editor.isActive("paragraph", { listType: "upper-roman" }) ||
+        editor.isActive("heading", { listType: "upper-roman" }) ||
+        editor.isActive("paragraph", { listType: "lower-roman" }) ||
+        editor.isActive("heading", { listType: "lower-roman" }) ||
+        editor.isActive("paragraph", { listType: "lower-greek" }) ||
+        editor.isActive("heading", { listType: "lower-greek" })
+      }
       onClick={onClick}
       subTypes={[
         { type: "decimal", title: "Decimal", items: ["1", "2", "3"] },
@@ -158,7 +175,7 @@ export function NumberedList(props: ToolProps) {
 export function BulletList(props: ToolProps) {
   const { editor } = props;
   const onClick = useCallback(
-    () => editor.chain().focus().toggleBulletList().run(),
+    () => editor.chain().focus().toggleBulletMarker().run(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -168,7 +185,17 @@ export function BulletList(props: ToolProps) {
       {...props}
       type="bulletList"
       onClick={onClick}
-      isActive={editor.isActive("bulletList")}
+isActive={
+editor.isActive("paragraph", { listType: "bullet" }) ||
+        editor.isActive("heading", { listType: "bullet" }) ||
+        editor.isActive("paragraph", { listType: "disc"
+      }) ||
+        editor.isActive("heading", { listType: "disc" }) ||
+        editor.isActive("paragraph", { listType: "circle" }) ||
+        editor.isActive("heading", { listType: "circle" }) ||
+        editor.isActive("paragraph", { listType: "square" }) ||
+        editor.isActive("heading", { listType: "square" })
+      }
       subTypes={[
         { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
         { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
@@ -185,42 +212,37 @@ export function CheckList(props: ToolProps) {
     <ToolButton
       icon={props.icon}
       title={props.title}
-      toggled={false}
-      onClick={() => editor.chain().focus().toggleCheckList().run()}
+      toggled={
+        editor.isActive("paragraph", { listType: "check" }) ||
+        editor.isActive("heading", { listType: "check" })
+      }
+      onClick={() => editor.chain().focus().toggleCheckMarker().run()}
     />
   );
 }
 
 export function Indent(props: ToolProps) {
   const { editor } = props;
-  const isBottom = useToolbarLocation() === "bottom";
-
-  const listItemType = findListItemType(editor);
-  if (!listItemType || !isBottom) return null;
-
+  
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
       toggled={false}
-      onClick={() => editor.chain().focus().sinkListItem(listItemType).run()}
+      onClick={() => editor.chain().focus().indent().run()}
     />
   );
 }
 
 export function Outdent(props: ToolProps) {
   const { editor } = props;
-  const isBottom = useToolbarLocation() === "bottom";
-
-  const listItemType = findListItemType(editor);
-  if (!listItemType || !isBottom) return null;
 
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
       toggled={false}
-      onClick={() => editor.chain().focus().liftListItem(listItemType).run()}
+      onClick={() => editor.chain().focus().outdent().run()}
     />
   );
 }
