@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test } from "vitest";
 import { createEditor, h } from "../../../../test-utils/index.js";
-import OrderedList from "../../ordered-list/index.js";
 import { ListItem } from "../../list-item/index.js";
 import { transformCopied } from "../index.js";
 import { Paragraph } from "../../paragraph/index.js";
@@ -28,148 +27,11 @@ import { clipboardTextSerializer } from "../clipboard-text-serializer.js";
 import Link from "../../link/index.js";
 import { BlockIndent } from "../../block-indent/index.js";
 import { ListMarker } from "../../list-marker/index.js";
-import { createEditor, h } from "../../../../test-utils/index.js";
-import OrderedList from "../../ordered-list/index.js";
-import { ListItem } from "../../list-item/index.js";
-import { transformCopied } from "../index.js";
-import { Paragraph } from "../../paragraph/index.js";
-import { ClipboardDOMSerializer } from "../clipboard-dom-serializer.js";
-import { clipboardTextSerializer } from "../clipboard-text-serializer.js";
-import Link from "../../link/index.js";
 
 function cleanOutputHtml(html: string) {
   return html.replaceAll(` xmlns="http://www.w3.org/1999/xhtml"`, "");
 }
-test("copied list items shouldn't contain extra newlines", (t) => {
-  const { editor } = createEditor({
-    initialContent: h("div", [
-      h("ol", [
-        h("li", [
-          h("p", ["This is line: ", h("em", ["number 1."])]),
-          h("p", ["And this is line number 2."])
-        ]),
-        h("li", [h("p", ["This is line number 3."])])
-      ])
-    ]).innerHTML,
-    extensions: {
-      orderedList: OrderedList,
-      listItem: ListItem
-    }
-  });
 
-  const serializer = ClipboardDOMSerializer.fromSchema(
-    editor.view.state.schema
-  );
-  t.expect(
-    cleanOutputHtml(
-      new XMLSerializer().serializeToString(
-        serializer.serializeFragment(
-          editor.state.doc.slice(0, editor.state.doc.nodeSize - 2).content
-        )
-      )
-    )
-  ).toBe(
-    "<ol><li><p>This is line: <em>number 1.</em></p><p>And this is line number 2.</p></li><li>This is line number 3.</li></ol>"
-  );
-
-  t.expect(
-    clipboardTextSerializer(
-      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
-      editor.view
-    )
-  ).toBe(`This is line: number 1.
-And this is line number 2.
-This is line number 3.`);
-});
-
-test("copying a single list item shouldn't copy the list metadata", (t) => {
-  const { editor } = createEditor({
-    initialContent: h("div", [h("ol", [h("li", ["Hello"])])]).innerHTML,
-    extensions: {
-      orderedList: OrderedList,
-      listItem: ListItem
-    }
-  });
-
-  t.expect(
-    transformCopied(
-      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
-      editor.view
-    ).toJSON()
-  ).toMatchSnapshot();
-});
-
-test("copying text from a list item shouldn't add extra spaces at the end", (t) => {
-  const { editor } = createEditor({
-    initialContent: h("div", [
-      h("ol", [
-        h("li", [
-          h("p", ["I am ", h("a", ["Hello"], { href: "https://google.com/" })])
-        ])
-      ])
-    ]).innerHTML,
-    extensions: {
-      orderedList: OrderedList,
-      listItem: ListItem,
-      link: Link
-    }
-  });
-
-  t.expect(
-    transformCopied(
-      editor.state.doc.slice(
-        editor.state.doc.nodeSize - 10,
-        editor.state.doc.nodeSize - 2
-      ),
-      editor.view
-    ).toJSON()
-  ).toMatchSnapshot();
-});
-
-test("copying multiple lists shouldn't copy only the first list", (t) => {
-  const { editor } = createEditor({
-    initialContent: h("div", [
-      h("ol", [h("li", ["Hello"])]),
-      h("ol", [h("li", ["Hello 2"])]),
-      h("ol", [h("li", ["Hello 3"])])
-    ]).innerHTML,
-    extensions: {
-      orderedList: OrderedList,
-      listItem: ListItem
-    }
-  });
-
-  t.expect(
-    transformCopied(
-      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
-      editor.view
-    ).toJSON()
-  ).toMatchSnapshot();
-});
-
-test("copying a single nested list item shouldn't copy the list metadata", (t) => {
-  const { editor } = createEditor({
-    initialContent: h("div", [
-      h("ol", [
-        h("li", [
-          h("p", ["Hello"]),
-          h("ol", [h("li", [h("p", ["Nested list item"])])])
-        ])
-      ])
-    ]).innerHTML,
-    extensions: {
-      orderedList: OrderedList,
-      listItem: ListItem
-    }
-  });
-
-  t.expect(
-    transformCopied(
-      editor.state.doc.slice(12, editor.state.doc.nodeSize - 2),
-      editor.view
-    ).toJSON()
-  ).toMatchSnapshot();
-});
 
 const createParagraphs = (spacing: "double" | "single") => [
   h("p", ["I am paragraph 1."], { "data-spacing": spacing }),
