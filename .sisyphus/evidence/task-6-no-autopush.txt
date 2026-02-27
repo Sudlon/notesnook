@@ -1,0 +1,8 @@
+=== Task 6: Verify No Auto-Push ===
+Timestamp: Fri Feb 27 19:06:10 CET 2026
+
+Searching for 'git push' commands that are NOT in echo/print/comments:
+
+(No output - all 'git push' commands are inside echo/print or comments)
+
+PASS: Script does NOT auto-push

@@ -1,0 +1,65 @@
+TASK 4: ARTIFACT EXCLUSION VERIFICATION
+========================================
+Status: PASSED ✓
+
+SCENARIO 2: No excluded files leaked into the patch
+
+VERIFICATION PROCESS:
+1. List all files in patch
+2. Assert: no line contains 'sisyphus', 'package-lock', or 'tsbuildinfo'
+3. Verify: all 33 files are under packages/editor/ or packages/core/
+
+FILES IN PATCH:
+packages/core/src/__tests__/migrations.test.ts
+packages/core/src/collections/content.ts
+packages/core/src/migrations.ts
+packages/editor/src/extension-imports.ts
+packages/editor/src/extensions/block-indent/__tests__/block-indent.test.ts
+packages/editor/src/extensions/block-indent/__tests__/coexistence.test.ts
+packages/editor/src/extensions/block-indent/__tests__/edge-cases.test.ts
+packages/editor/src/extensions/block-indent/block-indent.css
+packages/editor/src/extensions/block-indent/block-indent.ts
+packages/editor/src/extensions/block-indent/index.ts
+packages/editor/src/extensions/check-list-item/__tests__/check-list-item.test.ts
+packages/editor/src/extensions/clipboard/clipboard-dom-parser.ts
+packages/editor/src/extensions/clipboard/clipboard-dom-serializer.ts
+packages/editor/src/extensions/clipboard/clipboard-text-serializer.ts
+packages/editor/src/extensions/clipboard/tests/clipboard-dom-parser.test.ts
+packages/editor/src/extensions/clipboard/tests/clipboard-dom-serializer.test.ts
+packages/editor/src/extensions/clipboard/tests/clipboard-text-serializer.test.ts
+packages/editor/src/extensions/key-map/__tests__/key-map.test.ts
+packages/editor/src/extensions/key-map/key-map.ts
+packages/editor/src/extensions/key-map/move-node.ts
+packages/editor/src/extensions/list-item/tests/list-item.test.ts
+packages/editor/src/extensions/list-marker/__tests__/list-marker.test.ts
+packages/editor/src/extensions/list-marker/__tests__/ordered-numbering.test.ts
+packages/editor/src/extensions/list-marker/index.ts
+packages/editor/src/extensions/list-marker/list-marker.ts
+packages/editor/src/extensions/list-marker/ordered-numbering.ts
+packages/editor/src/index.ts
+packages/editor/src/toolbar/tools/lists.tsx
+packages/editor/src/utils/__tests__/indent-migration.test.ts
+packages/editor/src/utils/indent-migration.ts
+packages/editor/src/utils/list.ts
+packages/editor/src/utils/node-types.ts
+packages/editor/styles/styles.css
+
+ARTIFACT SCAN:
+Checking for sisyphus: 0
+0
+Checking for package-lock: 0
+0
+Checking for tsbuildinfo: 0
+0
+
+DIRECTORY VERIFICATION:
+All files in packages/ subdirs: 33 / 33
+
+RESULTS:
+✓ No .sisyphus files
+✓ No package-lock.json files
+✓ No tsconfig.tsbuildinfo
+✓ All 33 files are source code under packages/editor/ or packages/core/
+✓ Patch is clean and ready for distribution
+
+CONCLUSION: Artifact exclusion successful. No incidental files in commit.

@@ -1,0 +1,18 @@
+=== Task 6: Conflict Guidance for High-Risk Files ===
+Timestamp: Fri Feb 27 19:06:06 CET 2026
+
+High-risk file 1: index.ts
+1
+  DOCUMENTED (found)
+
+High-risk file 2: extension-imports.ts
+1
+  DOCUMENTED (found)
+
+High-risk file 3: migrations.ts
+1
+  DOCUMENTED (found)
+
+High-risk file 4: key-map.ts
+1
+  DOCUMENTED (found)

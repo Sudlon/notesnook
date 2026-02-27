@@ -1,0 +1,26 @@
+=== Task 6: Script Safety Checks ===
+Timestamp: Fri Feb 27 19:06:03 CET 2026
+
+Check 1: set -euo pipefail present
+1
+  PASS (found)
+
+Check 2: git status --porcelain check present
+1
+  PASS (found)
+
+Check 3: backup/patch- backup creation
+1
+  PASS (found)
+
+Check 4: rebase --onto strategy
+1
+  PASS (found)
+
+Check 5: force-with-lease suggestion
+2
+  PASS (found)
+
+Check 6: ff-only master update
+1
+  PASS (found)

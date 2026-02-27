@@ -1,0 +1,83 @@
+TASK 4: CREATE SQUASHED PATCH COMMIT
+====================================
+Status: PASSED ✓
+
+SCENARIO 1: Squashed commit contains exactly the right files
+
+ACCEPTANCE CRITERIA:
+✓ Exactly 1 commit on patch branch: 1
+✓ Correct commit message: editor: implement OneNote-style flat indentation lists
+✓ Exactly 33 files in patch: 33
+✓ No artifacts in patch: 0 matches for sisyphus|package-lock|tsbuildinfo
+✓ Clean working directory: git status --porcelain (empty)
+
+EXECUTION SUMMARY:
+1. Created branch: git checkout -b onenote-indentation-patch master
+2. Squashed feature: git merge --squash feat/onenote-indentation
+3. Unstaged artifacts: git reset HEAD .sisyphus/ apps/mobile/package-lock.json apps/theme-builder/package-lock.json apps/web/package-lock.json tsconfig.tsbuildinfo
+4. Removed artifacts: git checkout -- lockfiles; rm -rf .sisyphus/* files
+5. Verified staging: 33 files, 0 artifacts
+6. Created commit: git commit -m "editor: implement OneNote-style flat indentation lists" -m "Signed-off-by: Sisyphus <clio-agent@sisyphuslabs.ai>"
+
+FILES STAGED (33 total):
+- packages/core/src/__tests__/migrations.test.ts (new)
+- packages/core/src/collections/content.ts (modified)
+- packages/core/src/migrations.ts (modified)
+- packages/editor/src/extension-imports.ts (modified)
+- packages/editor/src/extensions/block-indent/__tests__/block-indent.test.ts (new)
+- packages/editor/src/extensions/block-indent/__tests__/coexistence.test.ts (new)
+- packages/editor/src/extensions/block-indent/__tests__/edge-cases.test.ts (new)
+- packages/editor/src/extensions/block-indent/block-indent.css (new)
+- packages/editor/src/extensions/block-indent/block-indent.ts (new)
+- packages/editor/src/extensions/block-indent/index.ts (new)
+- packages/editor/src/extensions/check-list-item/__tests__/check-list-item.test.ts (deleted)
+- packages/editor/src/extensions/clipboard/clipboard-dom-parser.ts (modified)
+- packages/editor/src/extensions/clipboard/clipboard-dom-serializer.ts (modified)
+- packages/editor/src/extensions/clipboard/clipboard-text-serializer.ts (modified)
+- packages/editor/src/extensions/clipboard/tests/clipboard-dom-parser.test.ts (modified)
+- packages/editor/src/extensions/clipboard/tests/clipboard-dom-serializer.test.ts (new)
+- packages/editor/src/extensions/clipboard/tests/clipboard-text-serializer.test.ts (modified)
+- packages/editor/src/extensions/key-map/__tests__/key-map.test.ts (modified)
+- packages/editor/src/extensions/key-map/key-map.ts (modified)
+- packages/editor/src/extensions/key-map/move-node.ts (modified)
+- packages/editor/src/extensions/list-item/tests/list-item.test.ts (modified)
+- packages/editor/src/extensions/list-marker/__tests__/list-marker.test.ts (new)
+- packages/editor/src/extensions/list-marker/__tests__/ordered-numbering.test.ts (new)
+- packages/editor/src/extensions/list-marker/index.ts (new)
+- packages/editor/src/extensions/list-marker/list-marker.ts (new)
+- packages/editor/src/extensions/list-marker/ordered-numbering.ts (new)
+- packages/editor/src/index.ts (modified)
+- packages/editor/src/toolbar/tools/lists.tsx (modified)
+- packages/editor/src/utils/__tests__/indent-migration.test.ts (new)
+- packages/editor/src/utils/indent-migration.ts (new)
+- packages/editor/src/utils/list.ts (modified)
+- packages/editor/src/utils/node-types.ts (modified)
+- packages/editor/styles/styles.css (modified)
+
+ARTIFACTS EXCLUDED (19 files):
+✓ .sisyphus/boulder.json
+✓ .sisyphus/evidence/f1-compliance-audit.md
+✓ .sisyphus/evidence/f2-code-quality-review.md
+✓ .sisyphus/evidence/f3-manual-qa-report.md
+✓ .sisyphus/evidence/f4-scope-fidelity-check.md
+✓ .sisyphus/evidence/final-qa/00-blank-screen.png
+✓ .sisyphus/evidence/final-qa/00-startup-error.png
+✓ .sisyphus/evidence/task-3-indent-rendering.png
+✓ .sisyphus/evidence/task-3-marker-rendering.png
+✓ .sisyphus/notepads/onenote-indentation/decisions.md
+✓ .sisyphus/notepads/onenote-indentation/issues.md
+✓ .sisyphus/notepads/onenote-indentation/learnings.md
+✓ .sisyphus/notepads/onenote-indentation/problems.md
+✓ .sisyphus/plans/onenote-indentation.md
+✓ .sisyphus/test-indent.html
+✓ apps/mobile/package-lock.json
+✓ apps/theme-builder/package-lock.json
+✓ apps/web/package-lock.json
+✓ tsconfig.tsbuildinfo
+
+COMMIT HASH: 68cf395e4
+TIMESTAMP: 2026-02-27
+
+NEXT STEPS:
+- Ready for patch rebase onto upstream changes
+- Can be cherry-picked or rebased independently

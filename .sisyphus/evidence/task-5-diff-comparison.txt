@@ -1,0 +1,11 @@
+=== Task 5: Diff Comparison (Squashed vs Original) ===
+Timestamp: Fri Feb 27 18:50:26 CET 2026
+
+Comparing:
+  - git diff master..onenote-indentation-patch (squashed patch)
+  - git diff master..feat/onenote-indentation (original, excluding artifacts)
+
+Output (should be empty if no changes lost):
+
+
+=== End of Diff Comparison ===
