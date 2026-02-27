@@ -33,6 +33,8 @@ import { OutlineListItem } from "../../outline-list-item/outline-list-item.js";
 
 import { ListItem } from "../../list-item/list-item.js";
 import { Heading } from "../../heading/heading.js";
+import { BlockIndent } from "../../block-indent/block-indent.js";
+import { ListMarker } from "../../list-marker/list-marker.js";
 
 describe("key-map", () => {
   test("move paragraph up", async () => {
@@ -167,3 +169,4 @@ describe("key-map", () => {
     expect(editor.getHTML()).toBe(`<p>Hidden content</p>`);
   });
 });
+

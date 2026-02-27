@@ -115,7 +115,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Check list markers are handled by node view (checkbox element injected by Task 2) */
 /* Check list markers - inline pattern like bullet/ordered */
 [data-list-type="check"] {
-  padding-left: 1.5em; /* Space for checkbox */
+  /* Checkbox spacing provided by ::before margin-right, not padding */
 }
 
 /* Unchecked checkbox - border only, inline with text */

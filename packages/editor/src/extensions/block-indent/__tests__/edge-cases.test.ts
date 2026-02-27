@@ -506,3 +506,49 @@ test("Tab in code block does NOT apply indent (inserts tab/spaces)", () => {
     expect(preMatch).not.toContain("data-indent");
   }
 });
+
+test("Tab on checklist item increases indent level", () => {
+  const { editor } = createEditor({
+    extensions: {
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    },
+    initialContent: `<p data-list-type="check">Task item</p>`
+  });
+
+  // Position cursor in checklist item
+  editor.commands.setTextSelection({ from: 1, to: 1 });
+
+  // Call indent
+  editor.commands.indent();
+
+  const html = editor.getHTML();
+
+  // Verify checklist item is now indented
+  expect(html).toContain('data-indent="1"');
+  // Verify list type marker is preserved
+  expect(html).toContain('data-list-type="check"');
+});
+
+test("Shift-Tab on indented checklist item decreases indent level", () => {
+  const { editor } = createEditor({
+    extensions: {
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    },
+    initialContent: `<p data-indent="2" data-list-type="check">Task item</p>`
+  });
+
+  // Position cursor in checklist item
+  editor.commands.setTextSelection({ from: 1, to: 1 });
+
+  // Call outdent
+  editor.commands.outdent();
+
+  const html = editor.getHTML();
+
+  // Verify indent decreased
+  expect(html).toContain('data-indent="1"');
+  // Verify list type marker is preserved
+  expect(html).toContain('data-list-type="check"');
+});
