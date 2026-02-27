@@ -214,7 +214,7 @@ export const ListMarker = Extension.create({
               tr.setNodeMarkup(pos, undefined, {
                 ...node.attrs,
                 listType: currentType === "check" ? null : "check",
-                checked: currentType === "check" ? false : node.attrs.checked
+                checked: false
               });
             }
           });

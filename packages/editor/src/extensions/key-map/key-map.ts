@@ -148,6 +148,15 @@ export const KeyMap = Extension.create({
         }
 
         return editor.commands.deleteNode(currentNode.type);
+      },
+      [tiptapKeys.toggleBulletList.keys]: ({ editor }) => {
+        return editor.commands.toggleBulletMarker();
+      },
+      [tiptapKeys.toggleOrderedList.keys]: ({ editor }) => {
+        return editor.commands.toggleOrderedMarker();
+      },
+      [tiptapKeys.toggleCheckList.keys]: ({ editor }) => {
+        return editor.commands.toggleCheckMarker();
       }
     };
   }
