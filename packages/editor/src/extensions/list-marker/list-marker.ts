@@ -39,8 +39,9 @@ function createCheckboxClickPlugin() {
           
           // Get indent level from data-indent attribute
           const indentLevel = parseInt(checkListItem.getAttribute('data-indent') || '0', 10);
-          // Calculate indent offset: 2em per indent level (assuming 16px base font = 32px per level)
-          const indentOffset = indentLevel * 32;
+          // Get actual computed padding to account for any font size
+          const computedStyle = window.getComputedStyle(checkListItem);
+          const indentOffset = parseFloat(computedStyle.paddingLeft) || 0;
           
           const checkboxHitAreaWidth = 30; // 14px checkbox + ~8px margin + padding
           const hitArea = { width: 40, height: 40 };
