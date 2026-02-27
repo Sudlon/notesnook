@@ -37,19 +37,24 @@ function createCheckboxClickPlugin() {
           const clientX = (event as MouseEvent).clientX;
           const clientY = (event as MouseEvent).clientY;
           
+          // Get indent level from data-indent attribute
+          const indentLevel = parseInt(checkListItem.getAttribute('data-indent') || '0', 10);
+          // Calculate indent offset: 2em per indent level (assuming 16px base font = 32px per level)
+          const indentOffset = indentLevel * 32;
+          
           const checkboxHitAreaWidth = 30; // 14px checkbox + ~8px margin + padding
           const hitArea = { width: 40, height: 40 };
           const isRtl = target.dir === "rtl";
           
-          // Checkbox is inline at the start of content, check first ~30px
-          let xStart = clientX >= x;
-          let xEnd = clientX <= x + checkboxHitAreaWidth;
+          // Checkbox is inline at the start of content, check first ~30px plus indent offset
+          let xStart = clientX >= (x + indentOffset);
+          let xEnd = clientX <= (x + indentOffset + checkboxHitAreaWidth);
           const yStart = clientY >= y;
           const yEnd = clientY <= y + hitArea.height;
           
           if (isRtl) {
-            xStart = clientX >= right - checkboxHitAreaWidth;
-            xEnd = clientX <= right;
+            xStart = clientX >= (right - indentOffset - checkboxHitAreaWidth);
+            xEnd = clientX <= (right - indentOffset);
           }
           
           if (xStart && xEnd && yStart && yEnd) {
