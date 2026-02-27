@@ -44,6 +44,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertBrToSingleSpacedParagraphs(dom);
       removePremiumFeatures(dom);
       removeBlockId(dom);
+      convertNestedListsToFlat(dom);
     }
     return super.parseSlice(dom, options);
   }
@@ -55,10 +56,15 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertBrToSingleSpacedParagraphs(dom);
       removePremiumFeatures(dom);
       removeBlockId(dom);
+      convertNestedListsToFlat(dom);
     }
     return super.parse(dom, options);
   }
 }
+
+
+
+
 
 export function removeBlockId(dom: HTMLElement | Document) {
   for (const element of dom.querySelectorAll("[data-block-id]")) {
@@ -242,4 +248,91 @@ function getSiblingTextNodes(element: ChildNode) {
 
 function isElement(node: ChildNode): node is HTMLElement {
   return node.nodeType === Node.ELEMENT_NODE;
+}
+
+
+export function convertNestedListsToFlat(dom: HTMLElement | Document): void {
+  // Find all top-level <ul> and <ol> elements
+  const lists = Array.from(dom.querySelectorAll("ul, ol"));
+
+  for (const list of lists) {
+    // Skip TipTap task lists and outline lists
+    if (
+      list.getAttribute("data-type") === "taskList" ||
+      list.getAttribute("data-type") === "outlineList"
+    ) {
+      continue;
+    }
+
+    // Skip if already processed or is nested within an <li>
+    if (list.parentElement?.tagName === "LI") {
+      continue; // Will be processed when parent li is handled
+    }
+
+    const listType = list.tagName === "OL" ? "ordered" : "bullet";
+    const flatBlocks = convertListToFlat(list as HTMLUListElement | HTMLOListElement, listType, 0);
+
+    // Replace list with flat blocks
+    const parent = list.parentNode;
+    if (parent) {
+      flatBlocks.forEach((block) => parent.insertBefore(block, list));
+      parent.removeChild(list);
+    }
+  }
+}
+
+function convertListToFlat(
+  list: HTMLUListElement | HTMLOListElement,
+  listType: string,
+  depth: number
+): HTMLElement[] {
+  const result: HTMLElement[] = [];
+  const items = Array.from(list.children).filter(
+    (el) => el.tagName === "LI"
+  );
+
+  for (const li of items) {
+    // Extract direct content (text nodes + inline elements, not nested lists)
+    const directContent: Node[] = [];
+    const nestedLists: Element[] = [];
+
+    for (const child of Array.from(li.childNodes)) {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        const el = child as Element;
+        if (el.tagName === "UL" || el.tagName === "OL") {
+          nestedLists.push(el);
+        } else {
+          directContent.push(child);
+        }
+      } else {
+        directContent.push(child);
+      }
+    }
+
+    // Create flat paragraph for direct content
+    const p = document.createElement("p");
+    p.setAttribute("data-indent", String(depth));
+    p.setAttribute("data-list-type", listType);
+
+    // Clone and append direct content
+    directContent.forEach((node) => {
+      p.appendChild(node.cloneNode(true));
+    });
+
+    result.push(p);
+
+    // Recursively process nested lists
+    for (const nestedList of nestedLists) {
+      const nestedType =
+        nestedList.tagName === "OL" ? "ordered" : "bullet";
+      const nestedBlocks = convertListToFlat(
+        nestedList as HTMLUListElement | HTMLOListElement,
+        nestedType,
+        depth + 1
+      );
+      result.push(...nestedBlocks);
+    }
+  }
+
+  return result;
 }
