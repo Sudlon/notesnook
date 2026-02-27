@@ -1219,7 +1219,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/extensions/clipboard/clipboard-dom-parser.ts`, `packages/editor/src/extensions/clipboard/tests/clipboard-dom-parser.test.ts`
   - Pre-commit: `npx vitest run src/extensions/clipboard/tests/clipboard-dom-parser`
 
-- [ ] 11. Markdown/Text Export — Indented List Syntax
+- [x] 11. Markdown/Text Export — Indented List Syntax
 
   **What to do**:
   - Modify `packages/editor/src/extensions/clipboard/clipboard-text-serializer.ts`:
@@ -1332,7 +1332,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/extensions/clipboard/clipboard-text-serializer.ts`, `packages/editor/src/extensions/clipboard/tests/clipboard-text-serializer.test.ts`
   - Pre-commit: `npx vitest run src/extensions/clipboard/tests/clipboard-text-serializer`
 
-- [ ] 12. Data Migration Integration — Existing Notes
+- [x] 12. Data Migration Integration — Existing Notes
 
   **What to do**:
   - Wire the `migrateNestedListsToFlat()` utility from Task 4 into the content loading pipeline:
