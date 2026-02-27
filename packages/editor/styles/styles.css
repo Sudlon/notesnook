@@ -113,46 +113,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 }
 
 /* Check list markers are handled by node view (checkbox element injected by Task 2) */
+/* Check list markers - inline pattern like bullet/ordered */
 [data-list-type="check"] {
-  position: relative;
   padding-left: 1.5em; /* Space for checkbox */
 }
 
-/* Unchecked checkbox - border only */
-[data-list-type="check"]::after {
-  position: absolute;
-  top: calc((1lh - 18px) / 2);
-  cursor: pointer;
+/* Unchecked checkbox - border only, inline with text */
+[data-list-type="check"]::before {
   content: "";
-  background-size: 18px;
+  display: inline-block;
+  vertical-align: middle;
   width: 14px;
   height: 14px;
-  
   border: 2px solid var(--icon);
   border-radius: 5px;
-  left: -24px;
+  margin-right: 0.5em;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 /* Checked state - accent border */
-[data-list-type="check"][data-checked="true"]::after {
-  border: 2px solid var(--accent);
-}
-
-/* Checkmark icon - only when checked */
 [data-list-type="check"][data-checked="true"]::before {
-  position: absolute;
-  top: calc((1lh - 14px) / 2);
-  cursor: pointer;
-  content: "";
-  background-size: 18px;
-  width: 14px;
-  height: 14px;
-  left: -22px;
-  
+  border: 2px solid var(--accent);
   background-color: var(--accent);
-  mask: url(data:image/svg+xml;base64,ICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik0yMSw3TDksMTlMMy41LDEzLjVMNC45MSwxMi4wOUw5LDE2LjE3TDE5LjU5LDUuNTlMMjEsN1oiLz4KICAKICA8L3N2Zz4K)
+  mask: url(data:image/svg+xml;base64,ICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik0yMSw3TDksMTlMMy41LDEzLjVMNC45MSwxMi4wOUw5LDE2LjE3TDE5LjU5LDUuNTlMMjEsN1oiLz4KICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKK
     no-repeat 50% 50%;
   mask-size: cover;
+  -webkit-mask: url(data:image/svg+xml;base64,ICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGQ9Ik0yMSw3TDksMTlMMy41LDEzLjVMNC45MSwxMi4wOUw5LDE2LjE3TDE5LjU5LDUuNTlMMjEsN1oiLz4KICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKICAKK
+    no-repeat 50% 50%;
+  -webkit-mask-size: cover;
 }
 
 /* Checked content - reduce opacity like simple-checklist */
@@ -160,15 +149,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   opacity: 0.8;
 }
 
-/* RTL support */
-[dir="rtl"] [data-list-type="check"]::after {
-  left: unset;
-  right: -24px;
-}
-
-[dir="rtl"] [data-list-type="check"][data-checked="true"]::before {
-  left: unset;
-  right: -22px;
+/* RTL support - checkbox flows inline in both directions */
+[dir="rtl"] [data-list-type="check"]::before {
+  margin-right: 0;
+  margin-left: 0.5em;
 }
 
 @keyframes fadeIn {
