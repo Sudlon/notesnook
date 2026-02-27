@@ -32,7 +32,7 @@ import Database from "../api/index.js";
 import { getOutputType } from "./attachments.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { InternalLink } from "../utils/internal-link.js";
-import { tinyToTiptap } from "../migrations.js";
+import { tinyToTiptap, migrateNestedListsToFlat } from "../migrations.js";
 import { EVENTS } from "../common.js";
 import { DeleteEvent, UpdateEvent } from "../database/index.js";
 import { logger } from "../logger.js";
@@ -320,6 +320,19 @@ export class Content implements ICollection {
       content.type = "tiptap";
       content.data = tinyToTiptap(content.data);
       changed = true;
+    }
+
+    // #MIGRATION: convert nested lists to flat indent model
+    if (content.data.includes("<ul") || content.data.includes("<ol")) {
+      // Skip if already flat (has data-indent and no bare list wrappers)
+      const hasDataIndent = content.data.includes("data-indent");
+      const hasBareUl = /<ul(?![^>]*data-type)/.test(content.data);
+      const hasBareOl = /<ol(?![^>]*data-type)/.test(content.data);
+      
+      if (!hasDataIndent || hasBareUl || hasBareOl) {
+        content.data = migrateNestedListsToFlat(content.data);
+        changed = true;
+      }
     }
 
     // add block id on all appropriate nodes

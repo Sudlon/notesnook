@@ -26,6 +26,16 @@ import { Paragraph } from "../../paragraph/index.js";
 import { ClipboardDOMSerializer } from "../clipboard-dom-serializer.js";
 import { clipboardTextSerializer } from "../clipboard-text-serializer.js";
 import Link from "../../link/index.js";
+import { BlockIndent } from "../../block-indent/index.js";
+import { ListMarker } from "../../list-marker/index.js";
+import { createEditor, h } from "../../../../test-utils/index.js";
+import OrderedList from "../../ordered-list/index.js";
+import { ListItem } from "../../list-item/index.js";
+import { transformCopied } from "../index.js";
+import { Paragraph } from "../../paragraph/index.js";
+import { ClipboardDOMSerializer } from "../clipboard-dom-serializer.js";
+import { clipboardTextSerializer } from "../clipboard-text-serializer.js";
+import Link from "../../link/index.js";
 
 function cleanOutputHtml(html: string) {
   return html.replaceAll(` xmlns="http://www.w3.org/1999/xhtml"`, "");
@@ -257,3 +267,112 @@ for (const testCase of paragraphTestCases) {
     ).toBe(testCase.expectedText);
   });
 }
+
+// Tests for flat list text export with indent and listType attributes
+test("flat bullet list at indent 0", (t) => {
+  const { editor } = createEditor({
+    initialContent: '<p data-list-type="bullet">Item</p>',
+    extensions: {
+      paragraph: Paragraph,
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    }
+  });
+
+  t.expect(
+    clipboardTextSerializer(
+      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
+      editor.view
+    )
+  ).toBe("- Item");
+});
+
+test("flat bullet list with indent 1", (t) => {
+  const { editor } = createEditor({
+    initialContent: '<p data-indent="1" data-list-type="bullet">Nested item</p>',
+    extensions: {
+      paragraph: Paragraph,
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    }
+  });
+
+  t.expect(
+    clipboardTextSerializer(
+      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
+      editor.view
+    )
+  ).toBe("  - Nested item");
+});
+
+test("flat ordered list", (t) => {
+  const { editor } = createEditor({
+    initialContent: '<p data-list-type="ordered">First</p><p data-list-type="ordered">Second</p>',
+    extensions: {
+      paragraph: Paragraph,
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    }
+  });
+
+  t.expect(
+    clipboardTextSerializer(
+      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
+      editor.view
+    )
+  ).toBe("1. First\n2. Second");
+});
+
+test("flat checked list item (checked)", (t) => {
+  const { editor } = createEditor({
+    initialContent: '<p data-list-type="check" data-checked="true">Task done</p>',
+    extensions: {
+      paragraph: Paragraph,
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    }
+  });
+
+  t.expect(
+    clipboardTextSerializer(
+      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
+      editor.view
+    )
+  ).toBe("- [x] Task done");
+});
+
+test("flat checked list item (unchecked)", (t) => {
+  const { editor } = createEditor({
+    initialContent: '<p data-list-type="check" data-checked="false">Task todo</p>',
+    extensions: {
+      paragraph: Paragraph,
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    }
+  });
+
+  t.expect(
+    clipboardTextSerializer(
+      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
+      editor.view
+    )
+  ).toBe("- [ ] Task todo");
+});
+
+test("flat paragraph with indent only (no listType)", (t) => {
+  const { editor } = createEditor({
+    initialContent: '<p data-indent="2">Indented text</p>',
+    extensions: {
+      paragraph: Paragraph,
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    }
+  });
+
+  t.expect(
+    clipboardTextSerializer(
+      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
+      editor.view
+    )
+  ).toBe("    Indented text");
+});

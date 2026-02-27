@@ -722,6 +722,117 @@ export function tinyToTiptap(html: string) {
   return document.body.innerHTML;
 }
 
+export function migrateNestedListsToFlat(html: string): string {
+  if (typeof html !== "string") return html;
+
+  const document = parseHTML(html);
+  if (!document) return html;
+
+  // Find all UL/OL elements that are NOT task lists or outline lists
+  const lists = document.querySelectorAll("ul:not([data-type]), ol");
+
+  const listArray = Array.from(lists);
+  for (const list of listArray) {
+    // Skip if it's a checklist with task-specific attributes (task list detection)
+    if (
+      list.classList.contains("checklist") &&
+      list.querySelector("[data-task-id]")
+    ) {
+      continue; // Skip task lists
+    }
+
+    // Convert list to flat paragraphs
+    const flattenedNodes = flattenList(list as any, 0, document);
+    const parent = list.parentElement;
+    if (parent) {
+      for (const node of flattenedNodes) {
+        parent.insertBefore(node, list);
+      }
+      parent.removeChild(list);
+    }
+  }
+
+  return document.body.innerHTML;
+}
+
+function flattenList(list: Element, indentLevel: number, document: any): Element[] {
+  const result: Element[] = [];
+  const listType =
+    list.tagName.toLowerCase() === "ul"
+      ? list.classList.contains("checklist")
+        ? "check"
+        : "bullet"
+      : "ordered";
+
+  const items = list.children;
+  for (const item of items) {
+    if (item.tagName.toLowerCase() === "li") {
+      // Extract content from <li>
+      let content = "";
+      const childNodes: (Element | Node)[] = [];
+      let nestedList: Element | null = null;
+
+      for (const child of item.childNodes) {
+        if (
+          child.nodeType === 1 &&
+          (child as Element).tagName.toLowerCase() === "ul"
+        ) {
+          nestedList = child as Element;
+        } else if (
+          child.nodeType === 1 &&
+          (child as Element).tagName.toLowerCase() === "ol"
+        ) {
+          nestedList = child as Element;
+        } else if (
+          child.nodeType === 1 &&
+          (child as Element).tagName.toLowerCase() === "p"
+        ) {
+          content = (child as Element).innerHTML;
+        } else {
+          childNodes.push(child);
+        }
+      }
+
+      // If no <p> found, use text content + other elements directly
+      if (!content && childNodes.length > 0) {
+        content = childNodes
+          .map((n) =>
+            n.nodeType === 3
+              ? (n as Text).textContent
+              : (n as Element).outerHTML
+          )
+          .join("");
+      }
+
+      // Create flat paragraph
+      const p = document.createElement("p");
+      p.innerHTML = content;
+      if (indentLevel > 0) {
+        p.setAttribute("data-indent", indentLevel.toString());
+      }
+      p.setAttribute("data-list-type", listType);
+
+      // Check if it's a checked item
+      if (
+        listType === "check" &&
+        item.getAttribute("data-checked") === "true"
+      ) {
+        p.setAttribute("data-checked", "true");
+      }
+
+      result.push(p);
+
+      // Process nested list
+      if (nestedList) {
+        const nestedFlattened = flattenList(nestedList, indentLevel + 1, document);
+        result.push(...nestedFlattened);
+      }
+    }
+  }
+
+  return result;
+}
+
 function changeSessionContentType(item: any) {
   if (item.id.endsWith("_content")) {
     item.contentType = item.type;
