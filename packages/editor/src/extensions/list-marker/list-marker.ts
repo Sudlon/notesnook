@@ -1,4 +1,5 @@
 import { Extension, InputRule } from "@tiptap/core";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { createOrderedNumberingPlugin } from "./ordered-numbering.js";
 
 declare module "@tiptap/core" {
@@ -11,6 +12,60 @@ declare module "@tiptap/core" {
       toggleChecked: () => ReturnType;
     };
   }
+}
+
+
+function createCheckboxClickPlugin() {
+  return new Plugin({
+    key: new PluginKey("checkboxClick"),
+    props: {
+      handleDOMEvents: {
+        click: (view, event) => {
+          const target = event.target as HTMLElement;
+          const checkListItem = target.closest('[data-list-type="check"]');
+          if (!checkListItem) return false;
+          
+          const pos = view.posAtDOM(checkListItem as HTMLElement, 0);
+          if (pos < 0) return false;
+          
+          const resolvedPos = view.state.doc.resolve(pos);
+          const node = resolvedPos.parent;
+          
+          if (node.attrs.listType !== "check") return false;
+          
+          const { x, y, right } = (checkListItem as HTMLElement).getBoundingClientRect();
+          const clientX = (event as MouseEvent).clientX;
+          const clientY = (event as MouseEvent).clientY;
+          
+          const hitArea = { width: 40, height: 40 };
+          const isRtl = target.dir === "rtl";
+          
+          let xStart = clientX >= x - hitArea.width;
+          let xEnd = clientX <= x;
+          const yStart = clientY >= y;
+          const yEnd = clientY <= y + hitArea.height;
+          
+          if (isRtl) {
+            xEnd = clientX <= right + hitArea.width;
+            xStart = clientX >= right;
+          }
+          
+          if (xStart && xEnd && yStart && yEnd) {
+            event.preventDefault();
+            view.dispatch(
+              view.state.tr.setNodeMarkup(resolvedPos.before(), undefined, {
+                ...node.attrs,
+                checked: !node.attrs.checked
+              })
+            );
+            return true;
+          }
+          
+          return false;
+        }
+      }
+    }
+  });
 }
 
 export const ListMarker = Extension.create({
@@ -63,7 +118,7 @@ export const ListMarker = Extension.create({
   },
 
   addProseMirrorPlugins() {
-    return [createOrderedNumberingPlugin()];
+    return [createOrderedNumberingPlugin(), createCheckboxClickPlugin()];
   },
 
   addInputRules() {
