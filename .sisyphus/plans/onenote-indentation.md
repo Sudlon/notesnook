@@ -211,7 +211,7 @@ Max Concurrent: 4 (all waves)
 ## TODOs
 
 
-- [ ] 1. Block Indent Extension (TipTap `addGlobalAttributes`)
+- [x] 1. Block Indent Extension (TipTap `addGlobalAttributes`)
 
   **What to do**:
   - Create new TipTap extension at `packages/editor/src/extensions/block-indent/block-indent.ts`
@@ -318,7 +318,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/extensions/block-indent/*`
   - Pre-commit: `npx vitest run src/extensions/block-indent`
 
-- [ ] 2. List Marker Attribute System
+- [x] 2. List Marker Attribute System
 
   **What to do**:
   - Create new TipTap extension at `packages/editor/src/extensions/list-marker/list-marker.ts`
@@ -520,7 +520,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/extensions/block-indent/block-indent.css`
   - Pre-commit: none (CSS only)
 
-- [ ] 4. Migration Utility (Nested HTML → Flat HTML)
+- [x] 4. Migration Utility (Nested HTML → Flat HTML)
 
   **What to do**:
   - Create `packages/editor/src/utils/indent-migration.ts`
@@ -622,7 +622,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/utils/indent-migration.ts`, `packages/editor/src/utils/__tests__/indent-migration.test.ts`
   - Pre-commit: `npx vitest run src/utils/__tests__/indent-migration`
 
-- [ ] 5. Tab/Shift-Tab Keybinding Rework
+- [x] 5. Tab/Shift-Tab Keybinding Rework
 
   **What to do**:
   - Modify `packages/editor/src/extensions/key-map/key-map.ts`:
@@ -726,7 +726,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/extensions/key-map/key-map.ts`, `packages/editor/src/index.ts`, list-item Tab handler files
   - Pre-commit: `npx vitest run src/extensions/key-map`
 
-- [ ] 6. List Type Toggle Commands Integration
+- [x] 6. List Type Toggle Commands Integration
 
   **What to do**:
   - Wire the list marker toggle commands (from Task 2) into the editor's command system in `packages/editor/src/index.ts`
@@ -815,7 +815,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/index.ts`, `packages/editor/src/utils/list.ts`, list-marker extension updates
   - Pre-commit: `npx vitest run`
 
-- [ ] 7. Ordered List Numbering Logic (OneNote-Style)
+- [x] 7. Ordered List Numbering Logic (OneNote-Style)
 
   **What to do**:
   - Create numbering computation at `packages/editor/src/extensions/list-marker/ordered-numbering.ts`
@@ -912,7 +912,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/extensions/list-marker/ordered-numbering.ts`
   - Pre-commit: `npx vitest run src/extensions/list-marker/__tests__/ordered-numbering`
 
-- [ ] 8. Toolbar Updates for Universal Indent/Outdent
+- [x] 8. Toolbar Updates for Universal Indent/Outdent
 
   **What to do**:
   - Update `packages/editor/src/toolbar/tools/lists.tsx`:
@@ -992,7 +992,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/toolbar/tools/lists.tsx`
   - Pre-commit: `npx vitest run`
 
-- [ ] 9. Clipboard DOM Serializer — Flat-to-Nested HTML Export
+- [x] 9. Clipboard DOM Serializer — Flat-to-Nested HTML Export
 
   **What to do**:
   - Modify `packages/editor/src/extensions/clipboard/clipboard-dom-serializer.ts`:
@@ -1094,7 +1094,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/extensions/clipboard/clipboard-dom-serializer.ts`, `packages/editor/src/extensions/clipboard/tests/clipboard-dom-serializer.test.ts`
   - Pre-commit: `npx vitest run src/extensions/clipboard/tests/clipboard-dom-serializer`
 
-- [ ] 10. Clipboard DOM Parser — Nested-to-Flat HTML Import (Paste)
+- [x] 10. Clipboard DOM Parser — Nested-to-Flat HTML Import (Paste)
 
   **What to do**:
   - Modify `packages/editor/src/extensions/clipboard/clipboard-dom-parser.ts`:
@@ -1456,7 +1456,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/core/src/migrations.ts`, `packages/core/src/collections/content.ts`
   - Pre-commit: `npx vitest run`
 
-- [ ] 13. Remove/Refactor Old Nested List Extensions
+- [x] 13. Remove/Refactor Old Nested List Extensions
 
   **What to do**:
   - Refactor the old list extensions that are no longer needed for bullet/ordered/check lists:
@@ -1570,7 +1570,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/index.ts`, `packages/editor/src/utils/node-types.ts`, `packages/editor/src/utils/list.ts`, old extension files
   - Pre-commit: `npx vitest run`
 
-- [ ] 14. Task/Outline List Coexistence Testing
+- [x] 14. Task/Outline List Coexistence Testing
 
   **What to do**:
   - Verify that task lists and outline lists work correctly alongside the new flat indent model:
@@ -1668,7 +1668,7 @@ Max Concurrent: 4 (all waves)
   - Files: `packages/editor/src/extensions/block-indent/__tests__/coexistence.test.ts`
   - Pre-commit: `npx vitest run src/extensions/block-indent/__tests__/coexistence`
 
-- [ ] 15. Edge Cases & Regression Tests
+- [x] 15. Edge Cases & Regression Tests
 
   **What to do**:
   - Write comprehensive edge case and regression tests covering scenarios that individual task tests may have missed:
