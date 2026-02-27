@@ -37,17 +37,19 @@ function createCheckboxClickPlugin() {
           const clientX = (event as MouseEvent).clientX;
           const clientY = (event as MouseEvent).clientY;
           
+          const checkboxHitAreaWidth = 30; // 14px checkbox + ~8px margin + padding
           const hitArea = { width: 40, height: 40 };
           const isRtl = target.dir === "rtl";
           
-          let xStart = clientX >= x - hitArea.width;
-          let xEnd = clientX <= x;
+          // Checkbox is inline at the start of content, check first ~30px
+          let xStart = clientX >= x;
+          let xEnd = clientX <= x + checkboxHitAreaWidth;
           const yStart = clientY >= y;
           const yEnd = clientY <= y + hitArea.height;
           
           if (isRtl) {
-            xEnd = clientX <= right + hitArea.width;
-            xStart = clientX >= right;
+            xStart = clientX >= right - checkboxHitAreaWidth;
+            xEnd = clientX <= right;
           }
           
           if (xStart && xEnd && yStart && yEnd) {
