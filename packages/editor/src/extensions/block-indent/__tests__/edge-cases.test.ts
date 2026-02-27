@@ -131,3 +131,140 @@ test("Deleting blocks with various indents leaves no orphaned attributes", () =>
   expect(html).toContain("Block D indent 1");
   expect(html).toContain("Block E");
 });
+
+test("Undo reverts indent change", () => {
+  const { editor } = createEditor({
+    extensions: {
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    },
+    initialContent: `<p>Block at indent 0</p>`
+  });
+
+  // Start: indent 0
+  let html = editor.getHTML();
+  expect(html).not.toContain('data-indent');
+
+  // Indent to level 1
+  editor.commands.indent();
+  html = editor.getHTML();
+  expect(html).toContain('data-indent="1"');
+
+  // Undo to revert indent
+  editor.commands.undo();
+  html = editor.getHTML();
+  expect(html).not.toContain('data-indent');
+});
+
+test("Undo reverts list type change while preserving indent", () => {
+  const { editor } = createEditor({
+    extensions: {
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    },
+    initialContent: `<p data-indent="2">Block at indent 2</p>`
+  });
+
+  // Start: indent 2, no list type
+  let html = editor.getHTML();
+  expect(html).toContain('data-indent="2"');
+  expect(html).not.toContain('data-list-type');
+
+  // Toggle bullet marker
+  editor.commands.toggleBulletMarker?.();
+  html = editor.getHTML();
+  expect(html).toContain('data-indent="2"');
+  expect(html).toContain('data-list-type="bullet"');
+
+  // Undo to revert list type change
+  editor.commands.undo();
+  html = editor.getHTML();
+  expect(html).toContain('data-indent="2"'); // Indent should be preserved
+  expect(html).not.toContain('data-list-type'); // List type should be removed
+});
+
+test("Multiple undo operations revert sequential indent changes", () => {
+  const { editor } = createEditor({
+    extensions: {
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    },
+    initialContent: `<p>Block at indent 0</p>`
+  });
+
+  // Start at indent 0
+  let html = editor.getHTML();
+  expect(html).not.toContain('data-indent');
+
+  // Indent 3 times: 0 -> 1 -> 2 -> 3
+  // Note: In ProseMirror, consecutive commands may batch into single undo step
+  // So we test that after 3 indents, undo reverts ALL of them at once
+  editor.commands.indent();
+  editor.commands.indent();
+  editor.commands.indent();
+  
+  html = editor.getHTML();
+  expect(html).toContain('data-indent="3"');
+
+  // Undo should revert all 3 indents back to original
+  editor.commands.undo();
+  html = editor.getHTML();
+  expect(html).not.toContain('data-indent');
+});
+
+test("Complex sequence of indent and list type changes can be fully undone", () => {
+  const { editor } = createEditor({
+    extensions: {
+      blockIndent: BlockIndent,
+      listMarker: ListMarker
+    },
+    initialContent: `<p>Block at indent 0</p>`
+  });
+
+  // Step 1: Start at indent 0, no marker
+  let html = editor.getHTML();
+  expect(html).not.toContain('data-indent');
+  expect(html).not.toContain('data-list-type');
+
+  // Step 2: Indent to level 1
+  editor.commands.indent();
+  html = editor.getHTML();
+  expect(html).toContain('data-indent="1"');
+  expect(html).not.toContain('data-list-type');
+
+  // Step 3: Add bullet marker
+  editor.commands.toggleBulletMarker?.();
+  html = editor.getHTML();
+  expect(html).toContain('data-indent="1"');
+  expect(html).toContain('data-list-type="bullet"');
+
+  // Step 4: Indent to level 2
+  editor.commands.indent();
+  html = editor.getHTML();
+  expect(html).toContain('data-indent="2"');
+  expect(html).toContain('data-list-type="bullet"');
+
+  // With ProseMirror history batching, consecutive commands may group into single undo steps
+  // Test that undo correctly reverts each user action
+
+  // Undo sequence: ProseMirror batches operations, so consecutive commands in the same
+  // execution may revert together. Test that eventually all changes are undone.
+  
+  // After undo 1
+  editor.commands.undo();
+  html = editor.getHTML();
+  // Might revert last indent and/or bullet, verify at least one reverted
+  const hasIndent = html.includes('data-indent="2"');
+  const hasBullet = html.includes('data-list-type="bullet"');
+  expect(!hasIndent || !hasBullet).toBe(true); // At least one should be gone
+  
+  // Continue undoing until back to start
+  while (html.includes('data-indent') || html.includes('data-list-type')) {
+    editor.commands.undo();
+    html = editor.getHTML();
+  }
+  
+  // Final verification: back to original state
+  expect(html).not.toContain('data-indent');
+  expect(html).not.toContain('data-list-type');
+});

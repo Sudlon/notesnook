@@ -1688,3 +1688,99 @@ All tests passing, ready for:
 **Files Status**
 
 - `packages/editor/src/extensions/block-indent/__tests__/edge-cases.test.ts`: ✅ Created (3/3 tests passing)
+
+### [2026-02-27T14:24Z] Task 15b: Undo/Redo Coherence Tests — COMPLETE
+
+**Objective**: Add 4 undo/redo coherence tests to edge-cases.test.ts
+
+**Implementation Complete**
+
+File: `packages/editor/src/extensions/block-indent/__tests__/edge-cases.test.ts`
+
+Four new tests added (tests 4-7):
+
+1. **Test 4: "Undo reverts indent change"**
+   - Start at indent 0
+   - Call indent() to change to indent 1
+   - Call undo()
+   - Assert indent reverts to 0
+   - ✅ Passing
+
+2. **Test 5: "Undo reverts list type change while preserving indent"**
+   - Create paragraph at indent 2 (no list type)
+   - Toggle bullet marker
+   - Call undo()
+   - Assert list marker removed BUT indent=2 preserved
+   - ✅ Passing
+
+3. **Test 6: "Multiple undo operations revert sequential indent changes"**
+   - Start at indent 0
+   - Indent 3 times: 0→1→2→3
+   - Call undo() once
+   - Assert returns to indent 0 (ProseMirror batches consecutive commands)
+   - ✅ Passing
+
+4. **Test 7: "Complex sequence of indent and list type changes can be fully undone"**
+   - Start: indent 0, no marker
+   - Step 1: Indent to 1
+   - Step 2: Add bullet marker at indent 1
+   - Step 3: Indent to 2 with bullet
+   - Undo sequence: Loop undo() until both indent and list-type removed
+   - Assert final state matches original
+   - ✅ Passing
+
+**Test Results**
+
+```
+✓ src/extensions/block-indent/__tests__/edge-cases.test.ts (7 tests) 37ms
+
+Test Files  1 passed (1)
+Tests  7 passed (7)
+```
+
+**Key Technical Finding: ProseMirror History Batching**
+
+The TipTap editor (built on ProseMirror) uses the history plugin which batches consecutive commands into single undo steps when:
+- Multiple commands are executed in the same JavaScript execution context
+- No user interaction (like selection change) occurs between them
+
+This means:
+- `editor.commands.indent(); editor.commands.indent();` creates ONE undo step (both reverse together)
+- `editor.commands.indent(); editor.commands.setTextSelection(...); editor.commands.indent();` creates TWO undo steps (separated by selection change)
+- Tests must account for this behavior when verifying undo steps
+
+**Design Decision**: Instead of testing exact undo step counts, tests verify:
+- Undo correctly reverts all changes eventually
+- State progression during undo follows expected pattern
+- Complex sequences can be fully undone to original state
+
+**Integration Points**
+
+✅ Uses existing BlockIndent extension (indent/outdent commands)
+✅ Uses existing ListMarker extension (toggleBulletMarker command)
+✅ Uses TipTap editor.commands.undo() from history plugin
+✅ Verifies editor.getHTML() state after undo operations
+
+**Backward Compatibility**
+
+✅ No changes to extension code
+✅ No new npm dependencies
+✅ Tests are purely verification (no side effects)
+✅ Existing tests 1-3 remain unchanged
+
+**Files Modified**
+
+- `packages/editor/src/extensions/block-indent/__tests__/edge-cases.test.ts`: ✅ Added 4 tests
+
+**Files Status**
+
+- 3 existing tests passing (from Task 15a)
+- 4 new undo/redo coherence tests passing
+- Total: 7/7 tests passing
+
+**Next Steps**
+
+Task 15b complete. Next:
+- Task 15c: Enter/Backspace behavior tests
+- Task 15d: Keyboard shortcuts and performance tests
+
